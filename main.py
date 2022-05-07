@@ -1,24 +1,19 @@
 import os
 import sys
-import pprint
 import logging
 
 import mesa
 import mesa.time
 import mesa.space
 
-from debug import Debug
-
 logging.getLogger()
 
-
-pp = pprint.PrettyPrinter(indent=4)
 
 logging.basicConfig(
     stream=sys.stdout,
     filemode="w",
     format="%(levelname)s %(asctime)s - %(message)s",
-    level=logging.DEBUG,
+    level=logging.INFO,
 )
 log = logging.getLogger(__name__)
 
@@ -27,14 +22,16 @@ class BallAgent(mesa.Agent):
 
     STATE_NEED = 1
     STATE_GRATIFIED = 2
-    STATE_FRUSTRATION = 3
+    # STATE_FRUSTRATION = 3
 
     def __init__(self, unique_id, model, gratification_limit):
         super().__init__(unique_id, model)
+        self.encountered_this_step = False
+        self.collision = False
+        self._gratification_limit = gratification_limit
 
         # Dependent variables
-        self.state = self.STATE_GRATIFIED
-        self.gratification_left = gratification_limit
+        self._set_state(self.STATE_GRATIFIED)
 
         # Independent variables
         self.frustration_proclivity = 1.0  # TODO: chance variation
@@ -46,25 +43,61 @@ class BallAgent(mesa.Agent):
         new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
+    def _set_state(self, state):
+        self.state = state
+        if state == self.STATE_GRATIFIED:
+            self.gratification_left = self._gratification_limit
+        else:
+            self.gratification_left = 0
+
+    def on_encounter(self, other):
+        """The main algorithm for an encounter between agents."""
+
+        log.info(
+            f"Agent {self.unique_id} & {other.unique_id} collision @ {self.pos}\t::\t{other.unique_id}"
+        )
+
+        if self.state == self.STATE_GRATIFIED:
+            pass
+        elif self.state == self.STATE_NEED:
+            if other == self.STATE_NEED:
+                self.state = self.STATE_GRATIFIED
+                other.state = self.STATE_GRATIFIED
+
     def step(self):
+
+        self.collision = False
+
+        if self.encountered_this_step:
+            return
+
+        # Update state over time.
+        if self.state == self.STATE_GRATIFIED:
+            self.gratification_left -= 1
+            if self.gratification_left == 0:
+                self.state = self.STATE_NEED
+                log.info(f"Agent {self.unique_id} -> STATE_NEED")
+
         self.move()
-        collisions = self.model.grid.get_cell_list_contents([self.pos])
-        if collisions:
-            log.info(
-                f"Agent {self.unique_id} collisions @ {self.pos}\t::\t{[x.unique_id for x in collisions]}"
-            )
+        for encounter in self.model.grid.get_cell_list_contents([self.pos]):
+            if encounter is not self and not encounter.encountered_this_step:
+                self.collision = True
+                encounter.collision = True
+                self.encountered_this_step = True
+                self.on_encounter(encounter)
+                break
 
 
 class MythematicalModel(mesa.Model):
     def __init__(self, N, width, height):
+        super().__init__()
         self.num_agents = N
         self.schedule = mesa.time.SimultaneousActivation(self)
         self.grid = mesa.space.MultiGrid(width, height, False)
 
-        GRATIFICATION_LIMIT = 3
-
         for i in range(self.num_agents):
-            a = BallAgent(i, self, gratification_limit=GRATIFICATION_LIMIT)
+            gratification_limit = self.random.randrange(3, 10)
+            a = BallAgent(i, self, gratification_limit=gratification_limit)
             self.schedule.add(a)
 
             x = self.random.randrange(self.grid.width)
@@ -72,6 +105,8 @@ class MythematicalModel(mesa.Model):
             self.grid.place_agent(a, (x, y))
 
     def step(self):
+        for agent in self.schedule.agents:
+            agent.encountered_this_step = False
         self.schedule.step()
 
 
@@ -80,24 +115,44 @@ from mesa.visualization.ModularVisualization import ModularServer
 
 
 def main_step():
-    model = MythematicalModel(10, 35, 35)
+    model = MythematicalModel(2, 35, 35)
     model.step()
 
 
 def main_web():
     def agent_portrayal(agent):
+
+        state_colors = {
+            # BallAgent.STATE_FRUSTRATION: "black",
+            BallAgent.STATE_GRATIFIED: "green",
+            BallAgent.STATE_NEED: "red",
+        }
+
+        def _color(agent):
+            if agent.collision:
+                log.info("collision")
+                return "blue"
+            else:
+                return state_colors.get(agent.state)
+
         portrayal = {
             "Shape": "circle",
-            "Color": "red",
-            "Filled": "true",
+            "Color": _color(agent),
+            "Filled": not agent.collision,
             "Layer": 0,
             "r": 0.5,
         }
         return portrayal
 
-    grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+    class Server(ModularServer):
+        verbose = False
+
+    grid = CanvasGrid(agent_portrayal, 20, 20, 500, 500)
     server = ModularServer(
-        MythematicalModel, [grid], "Methematical Model", {"N": 100, "width": 10, "height": 10}
+        MythematicalModel,
+        [grid],
+        "Methematical Model",
+        {"N": 10, "width": 20, "height": 20},
     )
     server.port = 8521  # The default
     server.launch()
