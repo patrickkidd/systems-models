@@ -111,20 +111,39 @@ class BallAgent(mesa.Agent):
 
 
 class MythematicalModel(mesa.Model):
-    def __init__(self, N, width, height, gratification_limit, need_limit):
+    def __init__(
+        self,
+        N,
+        width,
+        height,
+        gratification_limit,
+        gratification_limit_variation,
+        need_limit,
+        need_limit_variation,
+    ):
         super().__init__()
         self.num_agents = N
         self.schedule = mesa.time.SimultaneousActivation(self)
         self.grid = mesa.space.MultiGrid(width, height, False)
 
         for i in range(self.num_agents):
+            if need_limit_variation:
+                need_limit_variate = self.random.randrange(
+                    -need_limit_variation, need_limit_variation
+                )
+            else:
+                need_limit_variate = 0
+            if gratification_limit_variation:
+                gratification_limit_variate = self.random.randrange(
+                    -gratification_limit_variation, gratification_limit_variation + 1
+                )
+            else:
+                gratification_limit_variate = 0
             a = BallAgent(
                 i,
                 self,
-                gratification_limit=self.random.randrange(
-                    gratification_limit - 1, gratification_limit + 1
-                ),
-                need_limit=self.random.randrange(need_limit - 1, need_limit + 1),
+                gratification_limit=gratification_limit + gratification_limit_variate,
+                need_limit=need_limit + need_limit_variate,
             )
             self.schedule.add(a)
             x = self.random.randrange(self.grid.width)
@@ -193,8 +212,14 @@ def main_web():
             "need_limit": UserSettableParameter(
                 "slider", "Need Limit", NEED_LIMIT, 1, 30
             ),
+            "need_limit_variation": UserSettableParameter(
+                "slider", "Need Limit Variation", 0, 0, 10
+            ),
             "gratification_limit": UserSettableParameter(
                 "slider", "Gratification Limit", GRATIFICATION_LIMIT, 1, 30
+            ),
+            "gratification_limit_variation": UserSettableParameter(
+                "slider", "Gratification Limit Variation", 0, 0, 10
             ),
         },
     )
