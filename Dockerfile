@@ -41,4 +41,4 @@ EXPOSE 8521/tcp
 
 RUN pip3 install -r requirements.txt
 
-CMD ["sh", "-c", "cd $MODEL_DIR && python3 run.py"]
+CMD ["sh", "-c", "cd $MODEL_DIR && python3 run.py --models $MODELS"]
