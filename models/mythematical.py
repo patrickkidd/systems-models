@@ -1,25 +1,13 @@
-import os
-import sys
 import logging
 
 import mesa
 import mesa.time
 import mesa.space
-
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
 
-logging.getLogger()
-
-
-logging.basicConfig(
-    stream=sys.stdout,
-    filemode="w",
-    format="%(levelname)s %(asctime)s - %(message)s",
-    level=logging.INFO,
-)
 log = logging.getLogger(__name__)
 
 
@@ -161,72 +149,63 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 
 
-def main_step():
-    model = MythematicalModel(2, 35, 35)
-    model.step()
+# Independent variables
+
+SIZE = 20
+NUM_BALLS = 10
+NEED_LIMIT = 20
+GRATIFICATION_LIMIT = 10
 
 
-def main_web():
-    def agent_portrayal(agent):
+def agent_portrayal(agent):
 
-        state_colors = {
-            BallAgent.STATE_FRUSTRATED: "black",
-            BallAgent.STATE_GRATIFIED: "green",
-            BallAgent.STATE_NEED: "red",
-        }
+    state_colors = {
+        BallAgent.STATE_FRUSTRATED: "black",
+        BallAgent.STATE_GRATIFIED: "green",
+        BallAgent.STATE_NEED: "red",
+    }
 
-        def _color(agent):
-            if agent.collision:
-                return "blue"
-            else:
-                return state_colors.get(agent.state)
+    def _color(agent):
+        if agent.collision:
+            return "blue"
+        else:
+            return state_colors.get(agent.state)
 
-        portrayal = {
-            "Shape": "circle",
-            "Color": _color(agent),
-            "Filled": not agent.collision,
-            "Layer": 0,
-            "r": 0.5,
-        }
-        return portrayal
+    portrayal = {
+        "Shape": "circle",
+        "Color": _color(agent),
+        "Filled": not agent.collision,
+        "Layer": 0,
+        "r": 0.5,
+    }
+    return portrayal
 
-    class Server(ModularServer):
-        verbose = False
 
-    # Independent variables
-
-    SIZE = 20
-    NUM_BALLS = 10
-    NEED_LIMIT = 20
-    GRATIFICATION_LIMIT = 10
-
-    grid = CanvasGrid(agent_portrayal, SIZE, SIZE, 500, 500)
-    server = Server(
-        MythematicalModel,
-        [grid],
-        "Mythematical Social Pool Game",
-        {
-            "N": UserSettableParameter("slider", "N", NUM_BALLS, 2, 40),
-            "width": SIZE,
-            "height": SIZE,
-            "need_limit": UserSettableParameter(
-                "slider", "Need Limit", NEED_LIMIT, 1, 30
-            ),
-            "need_limit_variation": UserSettableParameter(
-                "slider", "Need Limit Variation", 0, 0, 10
-            ),
-            "gratification_limit": UserSettableParameter(
-                "slider", "Gratification Limit", GRATIFICATION_LIMIT, 1, 30
-            ),
-            "gratification_limit_variation": UserSettableParameter(
-                "slider", "Gratification Limit Variation", 0, 0, 10
-            ),
-        },
-    )
-    server.port = 8521  # The default
-    server.launch()
-    os.system(f'open "https://localhost:{server.port}"')
+grid = CanvasGrid(agent_portrayal, SIZE, SIZE, 500, 500)
+server = ModularServer(
+    MythematicalModel,
+    [grid],
+    "Mythematical Social Pool Game",
+    {
+        "N": UserSettableParameter("slider", "N", NUM_BALLS, 2, 40),
+        "width": SIZE,
+        "height": SIZE,
+        "need_limit": UserSettableParameter("slider", "Need Limit", NEED_LIMIT, 1, 30),
+        "need_limit_variation": UserSettableParameter(
+            "slider", "Need Limit Variation", 0, 0, 10
+        ),
+        "gratification_limit": UserSettableParameter(
+            "slider", "Gratification Limit", GRATIFICATION_LIMIT, 1, 30
+        ),
+        "gratification_limit_variation": UserSettableParameter(
+            "slider", "Gratification Limit Variation", 0, 0, 10
+        ),
+    },
+)
 
 
 if __name__ == "__main__":
-    main_web()
+    import os
+
+    server.launch()
+    os.system(f'open "https://localhost:{server.port}"')
