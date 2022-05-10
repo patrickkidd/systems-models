@@ -24,7 +24,7 @@ WORKDIR /opt/mesa
 
 COPY . /opt/mesa
 
-EXPOSE 8521/tcp
+EXPOSE 5001-5010/tcp
 
 # Important: we don't install python3-dev, python3-pip and so on because doing
 # so will install Python 3.9 instead of the already available Python 3.10 from

@@ -13,7 +13,7 @@ services:
       - .:/opt/mesad
     environment:
       MODEL_DIR: .
-      MODELS: mythematical,bowen
+      MODELS: mythematical
     ports:
       - "127.0.0.1:5001:5001"
       - "127.0.0.1:5002:5002"
