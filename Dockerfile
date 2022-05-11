@@ -14,8 +14,6 @@ LABEL maintainer="Patrick Stinson <patrick@alaskafamilysystems.com>"
 # `docker run --name mymesa_instance -p 8521:8521 -e MODEL_DIR=examples/sugarscape_cg -it mymesa_image`
 # Note: the model directory MUST contain a run.py file.
 
-ENV MODEL_DIR=mythematical
-
 # Don't buffer output:
 # https://docs.python.org/3.10/using/cmdline.html?highlight=pythonunbuffered#envvar-PYTHONUNBUFFERED
 ENV PYTHONUNBUFFERED=1
@@ -41,4 +39,4 @@ EXPOSE 5001-5010/tcp
 
 RUN pip3 install -r requirements.txt
 
-CMD ["sh", "-c", "cd $MODEL_DIR && python3 run.py --models $MODELS"]
+CMD ["sh", "-c", "python3 run.py --models $MODELS"]
