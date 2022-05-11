@@ -181,6 +181,13 @@ def agent_portrayal(agent):
     return portrayal
 
 
+import os, os.path
+
+MODEL_PATH = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(MODEL_PATH, "mythematical.html"), "r") as f:
+    NOTES = f.read()
+
+
 grid = CanvasGrid(agent_portrayal, SIZE, SIZE, 500, 500)
 server = ModularServer(
     MythematicalModel,
@@ -200,6 +207,7 @@ server = ModularServer(
         "gratification_limit_variation": UserSettableParameter(
             "slider", "Gratification Limit Variation", 0, 0, 10
         ),
+        "notes": UserSettableParameter("static_text", "Notes", NOTES),
     },
 )
 
