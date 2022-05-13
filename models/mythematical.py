@@ -341,7 +341,7 @@ server = ModularServer(
         ),
         "gratification_limit": UserSettableParameter(
             "slider",
-            "Gratification Limit (Steps)",
+            "Gratification Limit",
             DEFAULT_GRATIFICATION_LIMIT,
             1,
             30,
@@ -357,7 +357,7 @@ server = ModularServer(
         ),
         "need_limit": UserSettableParameter(
             "slider",
-            "Need Limit (Steps)",
+            "Need Limit",
             DEFAULT_NEED_LIMIT,
             1,
             30,
