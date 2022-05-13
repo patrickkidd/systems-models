@@ -20,7 +20,7 @@ STATE_FRUSTRATED = "frustrated"
 # Independent variables
 SIZE = 20
 DEFAULT_NUM_BALLS = 10
-DEFAULT_NEED_LIMIT = 20
+DEFAULT_NEED_LIMIT = 10
 DEFAULT_GRATIFICATION_LIMIT = 10
 FRUSTRATION_VARIATION_MAX = 3.0
 FRUSTRATION_VARIATION_STEP = 0.1
@@ -293,6 +293,7 @@ def agent_portrayal(agent):
         return "white"
 
     portrayal = {
+        "ID": agent.unique_id,
         "Shape": "circle",
         "Color": _fill_color(agent),
         "stroke_color": _stroke_color(agent),
@@ -303,9 +304,9 @@ def agent_portrayal(agent):
         "Need Limit": agent._need_limit,
         "Frustration Limit": agent._frustration_limit,
         "Frustratability": agent._frustration_multiplier,
-        "State Counter": agent.state_counter,
         "State": agent.state,
-        # "ignoredFeatures": ["Layer"]
+        "Steps in State": agent.state_counter,
+        "ignoredFeatures": ["Layer", "text", "x_offset"]
         # debug
         # "pos": agent.pos,
         # "unique_id": agent.unique_id,
@@ -373,7 +374,7 @@ server = ModularServer(
         "frustration_limit": UserSettableParameter(
             "slider",
             "Frustration Limit",
-            0,
+            5,
             0,
             10,
             description="Steps in before changing from frustrated to to need state.",
@@ -388,7 +389,7 @@ server = ModularServer(
             description="Range of randomly selected multiplier for how much more frustrated a ball becomes.",
         ),
         "show_step_counter": UserSettableParameter(
-            "checkbox", "Show Steps in Current State", value=False
+            "checkbox", "Show Steps in Current State", value=True
         ),
         "width": SIZE,
         "height": SIZE,
