@@ -1,2 +1,2 @@
 mesa
-git+https://github.com/patrickkidd/mesa.git
+git+https://github.com/patrickkidd/mesa.git@v0.9.0-pks
