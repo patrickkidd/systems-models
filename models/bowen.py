@@ -1,3 +1,7 @@
+"""
+Simulate inherited nuclear family emotional process as defined by Murray Bowen, M.D. from the NIMH family research project.
+"""
+
 import logging
 
 import mesa

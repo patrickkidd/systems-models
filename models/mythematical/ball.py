@@ -20,6 +20,7 @@ class Ball(mesa.Agent):
         frustration_multiplier,
     ):
         super().__init__(unique_id, model)
+        self.state = None
 
         # Independent variables
         self._gratification_limit = gratification_limit
@@ -37,9 +38,10 @@ class Ball(mesa.Agent):
         self._set_state(STATE_GRATIFIED)
 
     def _set_state(self, state):
+        state_was = self.state
         self.state = state
         self.state_counter = 0
-        log.info(f"Agent {self.unique_id} -> {state}")
+        log.info(f"Agent {self.unique_id}: {state_was} -> {state}")
 
     def step(self):
         # Only allow one encounter per step
