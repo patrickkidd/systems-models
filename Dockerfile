@@ -40,4 +40,4 @@ EXPOSE 5001-5010/tcp
 RUN apt-get update && apt-get install -y git
 RUN pip3 install -r requirements.txt
 
-CMD ["sh", "-c", "python3 run.py --models $MODELS"]
+CMD ["sh", "-c", "python3 run.py --models $MODELS --quiet"]
