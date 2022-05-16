@@ -37,6 +37,7 @@ EXPOSE 5001-5010/tcp
 #    python3-wheel \
 #    && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y git
 RUN pip3 install -r requirements.txt
 
 CMD ["sh", "-c", "python3 run.py --models $MODELS"]

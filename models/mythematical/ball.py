@@ -150,7 +150,7 @@ class Ball(mesa.Agent):
                     # CALHOUN: The more these balls are frustrated, the more they will try to escape
                     # from the field, the area within which meaningful contacts might occur. They
                     # seek the side pockets of their area of habitation. Here they are not visible
-                    # to view; their " dropping out" leads to a lowered estimate of their velocity
+                    # to view; their "dropping out" leads to a lowered estimate of their velocity
                     # in terms of the total path traversed in the contact opportunity area over
                     # extended periods of time.
                     frustration_level = (

@@ -1,7 +1,6 @@
 import sys
 import optparse
 import logging
-import multiprocessing as mp
 
 from models.mythematical import server
 
@@ -53,13 +52,19 @@ model_names = [name for name in options.models.split(",") if name in MODELS]
 
 if __name__ == "__main__":
 
-    log.info(f"Starting {len(model_names)} processes.")
-    manager = mp.Manager()
-    with mp.Pool(processes=len(model_names)) as pool:
-        pool.starmap(
-            go,
-            [
-                (MODELS.get(name).server, BASE_PORT + i)
-                for i, name in enumerate(model_names)
-            ],
-        )
+    log.info(f"Running models with {len(model_names)} processes.")
+    if len(model_names) == 1:
+        server = MODELS.get(model_names[0]).server
+        go(server, 5001)
+    else:
+        import multiprocessing as mp
+
+        manager = mp.Manager()
+        with mp.Pool(processes=len(model_names)) as pool:
+            pool.starmap(
+                go,
+                [
+                    (MODELS.get(name).server, BASE_PORT + i)
+                    for i, name in enumerate(model_names)
+                ],
+            )
