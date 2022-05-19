@@ -9,6 +9,12 @@ from .ball import *
 from .model import *
 
 
+COLOR_GRATIFIED = "#00ff00"
+COLOR_FRUSTRATED = "#000000"
+COLOR_NEED = "#ff0000"
+COLOR_ENCOUNTERS = "cyan"
+
+
 def agent_portrayal(agent):
 
     fill_colors = {
@@ -24,7 +30,7 @@ def agent_portrayal(agent):
     }
 
     stroke_colors = {
-        STATE_FRUSTRATED: "#000000",
+        STATE_FRUSTRATED: COLOR_FRUSTRATED,
         STATE_GRATIFIED: "#00ff00",
         STATE_NEED: "#ff0000",
     }
@@ -93,9 +99,20 @@ def agent_portrayal(agent):
 
 
 grid = CanvasGrid(agent_portrayal, SIZE, SIZE, 600, 600)
+data_collector = "datacollector"
+chart = ChartModule(
+    [
+        {"Label": "Gratified", "Color": COLOR_GRATIFIED},
+        {"Label": "Need", "Color": COLOR_NEED},
+        {"Label": "Frustrated", "Color": COLOR_FRUSTRATED},
+        {"Label": "Encounters", "Color": COLOR_ENCOUNTERS},
+    ],
+    SIZE,
+    SIZE,
+)
 server = ModularServer(
     MythematicalModel,
-    [grid],
+    [grid, chart],
     "Mythematical Social Pool Game",
     {
         "num_balls": UserSettableParameter(

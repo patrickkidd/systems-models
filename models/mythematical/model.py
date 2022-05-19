@@ -3,6 +3,9 @@ import logging
 import mesa
 import mesa.time
 import mesa.space
+from mesa.datacollection import DataCollector
+
+from models.mythematical.utils import STATE_GRATIFIED, STATE_NEED, STATE_FRUSTRATED
 
 from .ball import Ball
 
@@ -24,6 +27,18 @@ import os, os.path
 MODEL_PATH = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(MODEL_PATH, "mythematical.html"), "r") as f:
     ABOUT_HTML = f.read()
+
+
+def get_agent_gratified(agent):
+    return agent.state == STATE_GRATIFIED and 1 or 0
+
+
+def get_agent_need(agent):
+    return agent.state == STATE_NEED and 1 or 0
+
+
+def agent_frustrated(agent):
+    return agent.state == STATE_FRUSTRATED and 1 or 0
 
 
 class MythematicalModel(mesa.Model):
@@ -48,6 +63,25 @@ class MythematicalModel(mesa.Model):
         self.schedule = mesa.time.SimultaneousActivation(self)
         self.grid = mesa.space.MultiGrid(width, height, False)
         self.show_step_counter = show_step_counter
+
+        self.datacollector = DataCollector(
+            model_reporters={
+                "Gratified": lambda model: sum(
+                    1 if x.state == STATE_GRATIFIED else 0
+                    for x in model.schedule.agents
+                ),
+                "Need": lambda model: sum(
+                    1 if x.state == STATE_NEED else 0 for x in model.schedule.agents
+                ),
+                "Frustrated": lambda model: sum(
+                    1 if x.state == STATE_FRUSTRATED else 0
+                    for x in model.schedule.agents
+                ),
+                "Encounters": lambda model: sum(
+                    1 if x.encounter else 0 for x in model.schedule.agents
+                ),
+            }
+        )
 
         for i in range(self.num_agents):
             if need_limit_variation:
@@ -75,5 +109,14 @@ class MythematicalModel(mesa.Model):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
+        self.datacollector.collect(self)
+
     def step(self):
         self.schedule.step()
+        self.datacollector.collect(self)
+
+    def num_gratified(self):
+        def condition(x):
+            return x.state == STATE_GRATIFIED
+
+        return sum(condition(x) for x in self.schedule.agents)
