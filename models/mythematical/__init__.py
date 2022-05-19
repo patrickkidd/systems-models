@@ -18,9 +18,9 @@ COLOR_ENCOUNTERS = "cyan"
 def agent_portrayal(agent):
 
     fill_colors = {
-        STATE_FRUSTRATED: "#000000",
+        STATE_FRUSTRATED: COLOR_FRUSTRATED,
         STATE_GRATIFIED: "#00aa00",
-        STATE_NEED: "#ff0000",
+        STATE_NEED: COLOR_NEED,
     }
 
     fill_colors_encounter = {
@@ -31,8 +31,8 @@ def agent_portrayal(agent):
 
     stroke_colors = {
         STATE_FRUSTRATED: COLOR_FRUSTRATED,
-        STATE_GRATIFIED: "#00ff00",
-        STATE_NEED: "#ff0000",
+        STATE_GRATIFIED: COLOR_GRATIFIED,
+        STATE_NEED: COLOR_NEED,
     }
 
     def _fill_color(agent):
