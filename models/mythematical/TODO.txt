@@ -1,0 +1,8 @@
+- Add random "intensity" of contact.
+    - Calhoun doesn't say how it is determined
+- reproduction via "replication"
+    - inherited properties increase liklihood of "appropriate" behavior
+    - "intensity of involvement at time of contact"
+        - maximizes time spent in gratification
+    - attempt to maximize time in gratification state
+        - *** produces equivalent amount of frustration, b/c *that's life*
